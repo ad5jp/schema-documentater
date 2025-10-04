@@ -1,0 +1,9 @@
+/vendor/
+/phpunit.xml
+.phpunit.result.cache
+
+## IDE support
+*.buildpath
+*.project
+/.settings
+/.idea
