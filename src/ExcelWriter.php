@@ -88,10 +88,11 @@ class ExcelWriter implements Writer
         }
 
         $filename = ($schema ?: 'table_definitions') . date('_Ymd') . '.xlsx';
+        $output_path = __DIR__ . "/../output/{$filename}";
 
         $writer = new Xlsx($spreadsheet);
-        $writer->save(__DIR__ . "/../{$filename}");
+        $writer->save($output_path);
 
-        return $filename;
+        return $output_path;
     }
 }
