@@ -6,8 +6,10 @@ namespace Ad5jp\SchemaWriter;
 
 interface Writer
 {
+    public function prepare(): void;
+
     /**
      * @param Table[] $tables
      */
-    public function write(array $tables, ?string $schema = null): string;
+    public function write(array $tables): string;
 }

@@ -15,22 +15,29 @@ class Documentater
 
     }
 
-    public function run(string $host, string $schema, string $user, string $password): string
+    public function run(): string
     {
-        $tables = $this->reader->read($host, $schema, $user, $password);
+        $this->reader->prepare();
 
-        return $this->writer->write($tables, $schema);
+        $this->writer->prepare();
+
+        $tables = $this->reader->read();
+
+        return $this->writer->write($tables);
     }
 
-    public static function create(string $driver, string $format): self
+    public static function create(): self
     {
+        $driver = Config::getValue('driver', 'mysql');
+        $format = Config::getValue('format', 'excel_jp');
+
         $reader = match ($driver) {
             'mysql' => new MySQLReader(),
-            default => throw new Exception('Unknown driveer ' . $driver),
+            default => throw new Exception('Unknown driver ' . $driver),
         };
 
         $writer = match ($format) {
-            'excel' => new ExcelWriter(),
+            'excel_jp' => new ExcelJPWriter(),
             default => throw new Exception('Unknown format ' . $format),
         };
 

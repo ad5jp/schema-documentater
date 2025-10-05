@@ -7,14 +7,34 @@ namespace Ad5jp\SchemaWriter;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-class ExcelWriter implements Writer
+class ExcelJPWriter implements Writer
 {
+    public string $template;
+    public string $output_dir;
+    public string $output_filename;
+
+    public function __construct()
+    {
+        $default_template = __DIR__ . '/../resources/table_definitions.xlsx';
+        $default_output_dir = __DIR__ . '/../output';
+        $default_output_filename = Config::getValue('schema', 'table_definitions') . date('_Ymd');
+
+        $this->template = Config::getValue('template', $default_template);
+        $this->output_dir = Config::getValue('output_dir', $default_output_dir);
+        $this->output_filename = Config::getValue('output_filename', $default_output_filename);
+    }
+
+    public function prepare(): void
+    {
+        // do nothing
+    }
+
     /**
      * @inheritdoc
      */
-    public function write(array $tables, ?string $schema = null): string
+    public function write(array $tables): string
     {
-        $spreadsheet = IOFactory::load(__DIR__ . '/../resources/table_definitions.xlsx');
+        $spreadsheet = IOFactory::load($this->template);
 
         // --------------------------------
         // テーブル一覧シート
@@ -87,12 +107,11 @@ class ExcelWriter implements Writer
             $spreadsheet->addSheet($sheet);
         }
 
-        $filename = ($schema ?: 'table_definitions') . date('_Ymd') . '.xlsx';
-        $output_path = __DIR__ . "/../output/{$filename}";
+        $output_path = rtrim($this->output_dir, '/') . '/' . $this->output_filename . '.xlsx';
 
         $writer = new Xlsx($spreadsheet);
         $writer->save($output_path);
 
-        return $output_path;
+        return "Saved as: " . $output_path;
     }
 }

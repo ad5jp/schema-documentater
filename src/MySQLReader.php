@@ -8,12 +8,50 @@ use PDO;
 
 class MySQLReader implements Reader
 {
+    public ?string $schema;
+    public ?string $host;
+    public ?string $user;
+    public ?string $password;
+
+    public function __construct()
+    {
+        $this->schema = Config::getValue('schema');
+        $this->host = Config::getValue('host');
+        $this->user = Config::getValue('user');
+        $this->password = Config::getValue('password');
+    }
+
+    public function prepare(): void
+    {
+        while (empty($this->host)) {
+            echo "Host:";
+            $this->host = trim(fgets(STDIN));
+        }
+
+        while (empty($this->schema)) {
+            echo "Schema:";
+            $this->schema = trim(fgets(STDIN));
+        }
+
+        while (empty($this->user)) {
+            echo "User:";
+            $this->user = trim(fgets(STDIN));
+        }
+
+        while (empty($this->password)) {
+            echo "Password:";
+            system('stty -echo');
+            $this->password = trim(fgets(STDIN));
+            system('stty echo');
+        }
+    }
+
     /**
      * @inheritdoc
      */
-    public function read(string $host, string $schema, string $user, string $password): array
+    public function read(): array
     {
-        $pdo = new PDO("mysql:dbname={$schema};host={$host}", $user, $password);
+        $pdo = new PDO("mysql:dbname={$this->schema};host={$this->host}", $this->user, $this->password);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $stmt = $pdo->query('show table status');

@@ -6,8 +6,10 @@ namespace Ad5jp\SchemaWriter;
 
 interface Reader
 {
+    public function prepare(): void;
+
     /**
      * @return Table[]
      */
-    public function read(string $host, string $schema, string $user, string $password): array;
+    public function read(): array;
 }

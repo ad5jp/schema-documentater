@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use Ad5jp\SchemaWriter\Config;
 use Ad5jp\SchemaWriter\Documentater;
 
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
@@ -11,39 +12,9 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require __DIR__ . '/../../autoload.php';
 }
 
-$options = getopt("", ["host:", "schema:", "user:", "password:", "driver:", "format:"]);
+Config::set($argv);
 
-$host = $options['host'] ?? '';
-$schema = $options['schema'] ?? '';
-$user = $options['user'] ?? '';
-$password = $options['password'] ?? '';
-$driver = $options['driver'] ?? 'mysql';
-$format = $options['format'] ?? 'excel';
+$documentater = Documentater::create();
+$output = $documentater->run();
 
-while (empty($host)) {
-    echo "Host: \n";
-    $host = trim(fgets(STDIN));
-}
-
-while (empty($schema)) {
-    echo "Schema: \n";
-    $schema = trim(fgets(STDIN));
-}
-
-while (empty($user)) {
-    echo "User: \n";
-    $user = trim(fgets(STDIN));
-}
-
-while (empty($password)) {
-    echo "Password: \n";
-    system('stty -echo');
-    $password = trim(fgets(STDIN));
-    system('stty echo');
-}
-
-// ここから実行ロジック
-$documentater = Documentater::create($driver, $format);
-$output = $documentater->run($host, $schema, $user, $password);
-
-echo "Output: {$output}\n";
+echo "\n{$output}\n";
