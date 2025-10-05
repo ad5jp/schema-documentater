@@ -53,14 +53,24 @@ class ExcelJPWriter implements Writer
         // --------------------------------
         // テーブル別シート
         // --------------------------------
+        $titles = ['テーブル一覧' => 1, '雛形' => 1];
         foreach ($tables as $table) {
-            $templateSheet = $spreadsheet->getSheetByName('雛形');
-
             $column_start_row = 7;
             $index_start_row = 13;
 
+            // 雛形を複製
+            $templateSheet = $spreadsheet->getSheetByName('雛形');
             $sheet = clone $templateSheet;
-            $sheet->setTitle($table->comment ?: $table->name);
+
+            // シート名
+            $title = $table->comment ?: $table->name;
+            // 同じシート名が既にあれば _$i をつける
+            $titles[$title] = $i = ($titles[$title] ?? 0) + 1;
+            if ($i > 1) {
+                $title = "{$title}_{$i}";
+            }
+
+            $sheet->setTitle($title);
 
             // ヘッダ部分
             $sheet->setCellValue("B1", $table->name);
